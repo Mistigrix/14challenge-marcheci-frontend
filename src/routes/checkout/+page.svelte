@@ -10,6 +10,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import InputField from '$lib/components/ui/InputField.svelte';
+	import Loader from '$lib/components/ui/Loader.svelte';
 	import { themeColors } from '$lib/stores/theme.js';
 	import { cart, subtotal, tax, totalPrice, clearCart } from '$lib/stores/cart.js';
 	import { CI_ORANGE, CI_GREEN } from '$lib/utils/colors.js';
@@ -24,6 +25,9 @@
 
 	/** Commande confirmée ? */
 	let orderConfirmed = $state(false);
+
+	/** Loader de traitement de la commande */
+	let processing = $state(false);
 
 	// Champs adresse de livraison
 	let shippingName = $state('');
@@ -44,9 +48,14 @@
 	/** Labels des étapes du checkout */
 	const steps = ['Adresse', 'Paiement', 'Confirmation'];
 
-	/** Confirme la commande et affiche l'écran de succès */
+	/** Confirme la commande — simule un traitement avant l'écran de succès */
 	function confirmOrder() {
-		orderConfirmed = true;
+		processing = true;
+		// Simule le temps de traitement — sera remplacé par POST /api/orders
+		setTimeout(() => {
+			processing = false;
+			orderConfirmed = true;
+		}, 1500);
 	}
 
 	/** Retour au catalogue après commande — vide le panier */
@@ -62,7 +71,10 @@
 </svelte:head>
 
 <div class="checkout">
-	{#if orderConfirmed}
+	{#if processing}
+		<!-- Loader de traitement de la commande -->
+		<Loader size="lg" message="Traitement de votre commande..." />
+	{:else if orderConfirmed}
 		<!-- === Écran de confirmation === -->
 		<div class="confirmation">
 			<div class="confirm-icon">✓</div>

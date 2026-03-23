@@ -6,9 +6,126 @@
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<title>MarchéCI — Le marché de Côte d'Ivoire</title>
+
+		<!-- Styles du loader de chargement initial (inline pour affichage immédiat) -->
+		<style>
+			/* Loader plein écran — visible avant que SvelteKit ne prenne le relais */
+			#app-loader {
+				position: fixed;
+				inset: 0;
+				z-index: 9999;
+				background: #F8F6F2;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 28px;
+				transition: opacity 0.4s ease, visibility 0.4s ease;
+			}
+
+			/* Respecte le mode sombre si préféré par le système */
+			@media (prefers-color-scheme: dark) {
+				#app-loader { background: #0B0B10; }
+				#app-loader .loader-title { color: #F0EDE6; }
+				#app-loader .loader-subtitle { color: #777; }
+			}
+
+			/* Logo texte */
+			#app-loader .loader-title {
+				font-family: 'DM Sans', sans-serif;
+				font-size: 28px;
+				font-weight: 800;
+				color: #1A1A1A;
+				letter-spacing: -0.5px;
+				margin: 0;
+			}
+
+			#app-loader .loader-accent {
+				color: #FF8C00;
+			}
+
+			/* Drapeau CI animé */
+			#app-loader .flag {
+				display: flex;
+				width: 48px;
+				height: 6px;
+				border-radius: 3px;
+				overflow: hidden;
+			}
+
+			#app-loader .flag div {
+				flex: 1;
+			}
+
+			/* Barres pulsantes aux couleurs CI */
+			#app-loader .bars {
+				display: flex;
+				gap: 7px;
+				align-items: center;
+				height: 52px;
+			}
+
+			#app-loader .bars span {
+				width: 10px;
+				border-radius: 5px;
+				animation: app-pulse 1.2s ease-in-out infinite;
+			}
+
+			#app-loader .bars span:nth-child(1) {
+				background: #FF8C00;
+				animation-delay: 0s;
+			}
+			#app-loader .bars span:nth-child(2) {
+				background: #D4D4D4;
+				animation-delay: 0.2s;
+			}
+			#app-loader .bars span:nth-child(3) {
+				background: #009E49;
+				animation-delay: 0.4s;
+			}
+
+			@keyframes app-pulse {
+				0%, 100% { height: 16px; opacity: 0.4; }
+				50% { height: 44px; opacity: 1; }
+			}
+
+			/* Texte de chargement */
+			#app-loader .loader-subtitle {
+				font-family: 'DM Sans', sans-serif;
+				font-size: 13px;
+				color: #888;
+				margin: 0;
+				letter-spacing: 0.3px;
+			}
+
+			/* État masqué (après chargement) */
+			#app-loader.hidden {
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+			}
+		</style>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+
+		<!-- Loader de chargement initial — disparaît quand l'app Svelte est montée -->
+		<div id="app-loader">
+			<div class="flag">
+				<div style="background: #FF8C00;"></div>
+				<div style="background: #FFF;"></div>
+				<div style="background: #009E49;"></div>
+			</div>
+			<p class="loader-title">Marché<span class="loader-accent">CI</span></p>
+			<div class="bars">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+			<p class="loader-subtitle">Chargement du marché...</p>
+		</div>
+
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

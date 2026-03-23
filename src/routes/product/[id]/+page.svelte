@@ -5,10 +5,12 @@
   Récupère le produit par son id dans les données locales.
 -->
 <script>
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import ProductCard from '$lib/components/products/ProductCard.svelte';
 	import Stars from '$lib/components/ui/Stars.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Loader from '$lib/components/ui/Loader.svelte';
 	import { themeColors } from '$lib/stores/theme.js';
 	import { addToCart } from '$lib/stores/cart.js';
 	import { CI_ORANGE, CI_GREEN, getCoverGradient } from '$lib/utils/colors.js';
@@ -16,6 +18,14 @@
 	import { getProductById, getRelatedProducts, categories } from '$lib/data/products.js';
 
 	const colors = $derived($themeColors);
+
+	/** Simule le chargement du produit (sera remplacé par fetch API Django) */
+	let loading = $state(true);
+
+	onMount(() => {
+		const timer = setTimeout(() => { loading = false; }, 600);
+		return () => clearTimeout(timer);
+	});
 
 	/** Produit courant — récupéré depuis l'URL */
 	const product = $derived(getProductById(page.params.id));
@@ -40,7 +50,10 @@
 	<title>{product ? product.name : 'Produit'} — MarchéCI</title>
 </svelte:head>
 
-{#if product}
+<!-- Loader pendant le chargement du produit -->
+{#if loading}
+	<Loader size="lg" message="Chargement du produit..." />
+{:else if product}
 	<div class="product-page">
 		<!-- Retour au catalogue -->
 		<a href="/" class="back-link">

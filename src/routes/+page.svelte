@@ -5,18 +5,30 @@
   - Titre et sous-titre du marché
   - Filtres par catégorie
   - Barre de tri
+  - Skeleton loaders pendant le chargement
   - Grille responsive de ProductCards
 -->
 <script>
+	import { onMount } from 'svelte';
 	import CategoryFilter from '$lib/components/products/CategoryFilter.svelte';
 	import SortBar from '$lib/components/products/SortBar.svelte';
 	import ProductCard from '$lib/components/products/ProductCard.svelte';
+	import SkeletonCard from '$lib/components/ui/SkeletonCard.svelte';
 	import { themeColors } from '$lib/stores/theme.js';
 	import { filteredProducts } from '$lib/stores/filters.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 
 	const colors = $derived($themeColors);
 	const displayedProducts = $derived($filteredProducts);
+
+	/** Simule un chargement initial (sera remplacé par l'appel API Django) */
+	let loading = $state(true);
+
+	onMount(() => {
+		// Simule le temps de chargement — à remplacer par fetch API
+		const timer = setTimeout(() => { loading = false; }, 800);
+		return () => clearTimeout(timer);
+	});
 </script>
 
 <svelte:head>
@@ -40,12 +52,20 @@
 	<!-- Barre de tri et compteur -->
 	<SortBar />
 
-	<!-- Grille de produits -->
-	<div class="product-grid">
-		{#each displayedProducts as product (product.id)}
-			<ProductCard {product} />
-		{/each}
-	</div>
+	<!-- Grille de produits avec skeleton pendant le chargement -->
+	{#if loading}
+		<div class="product-grid">
+			{#each Array(8) as _}
+				<SkeletonCard />
+			{/each}
+		</div>
+	{:else}
+		<div class="product-grid">
+			{#each displayedProducts as product (product.id)}
+				<ProductCard {product} />
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
