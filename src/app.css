@@ -1,0 +1,58 @@
+/* === Styles globaux MarchéCI === */
+
+/* Reset de base */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* Police principale */
+body {
+	font-family: 'DM Sans', sans-serif;
+	min-height: 100vh;
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Boutons — feedback visuel */
+button:hover {
+	filter: brightness(1.05);
+}
+
+button:active {
+	transform: scale(0.97);
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 140, 0, 0.2);
+	border-radius: 3px;
+}
+
+/* Suppression du outline par défaut sur les inputs */
+input:focus {
+	outline: none;
+}
+
+/* === Responsive — variables et utilitaires === */
+
+/* Empêcher le débordement horizontal sur mobile */
+html, body {
+	overflow-x: hidden;
+}
+
+/* Tailles tactiles minimales sur mobile */
+@media (max-width: 640px) {
+	/* Cibles tactiles suffisantes (44px minimum recommandé) */
+	button, a {
+		min-height: 44px;
+	}
+}
