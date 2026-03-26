@@ -11,8 +11,10 @@ import { TAX_RATE } from '$lib/utils/format.js';
 /**
  * @typedef {Object} CartItem
  * @property {number} productId - Identifiant du produit
- * @property {string} name - Nom du produit
- * @property {number} price - Prix unitaire en FCFA
+ * @property {string} name - Nom du produit (title depuis l'API)
+ * @property {number} price - Prix unitaire
+ * @property {string} currency - Devise (ex: "GBP")
+ * @property {string} image_url - URL de l'image du produit
  * @property {number} quantity - Quantité dans le panier
  */
 
@@ -46,8 +48,10 @@ export function addToCart(product, qty = 1) {
 			...items,
 			{
 				productId: product.id,
-				name: product.name,
-				price: product.price,
+				name: product.title || product.name,
+				price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+				currency: product.currency || 'GBP',
+				image_url: product.image_url || '',
 				quantity: qty
 			}
 		];

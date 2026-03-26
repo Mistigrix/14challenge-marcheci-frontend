@@ -12,8 +12,15 @@ RUN npm ci
 # Copier le reste du code source
 COPY . .
 
+# URL de l'API Django injectée au build (accessible côté client via VITE_)
+ARG VITE_API_URL=https://api.marcheci.chalenge14.com
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build de production
 RUN npm run build
+
+# Supprimer les devDependencies pour alléger l'image
+RUN npm prune --omit=dev
 
 # === Étape 2 : Image de production légère ===
 FROM node:20-alpine AS production
@@ -31,6 +38,7 @@ EXPOSE 3000
 # Variables d'environnement
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV ORIGIN=https://marcheci.chalenge14.com
 
-# Lancer le serveur de production
+# Lancer le serveur Node
 CMD ["node", "build"]

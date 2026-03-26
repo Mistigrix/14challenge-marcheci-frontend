@@ -1,32 +1,23 @@
 <!--
   ProductCard — Carte produit dans la grille du catalogue
 
-  Affiche : image placeholder, badge, nom, étoiles, prix, bouton ajout panier.
+  Affiche : image du produit, titre, étoiles, prix, bouton ajout panier.
   Clic sur la carte → navigation vers la page produit détaillée.
 
   Props :
-  - product : objet Product (voir lib/data/products.js)
+  - product : objet produit API (id, title, price, image_url, rating, etc.)
 -->
 <script>
 	import { goto } from '$app/navigation';
-	import Badge from '$lib/components/ui/Badge.svelte';
 	import Stars from '$lib/components/ui/Stars.svelte';
 	import { themeColors } from '$lib/stores/theme.js';
 	import { addToCart } from '$lib/stores/cart.js';
-	import { CI_ORANGE } from '$lib/utils/colors.js';
-	import { getCoverGradient } from '$lib/utils/colors.js';
 	import { formatPrice } from '$lib/utils/format.js';
-	import { categories } from '$lib/data/products.js';
 
-	/** @type {import('$lib/data/products.js').Product} */
+	/** @type {Object} Produit depuis l'API */
 	let { product } = $props();
 
 	const colors = $derived($themeColors);
-
-	/** Icône de la catégorie du produit */
-	const categoryIcon = $derived(
-		categories.find((c) => c.id === product.category)?.icon || ''
-	);
 
 	/** Navigue vers la page de détail du produit */
 	function goToProduct() {
@@ -50,37 +41,42 @@
 	"
 	onclick={goToProduct}
 >
-	<!-- Image placeholder avec dégradé -->
-	<div
-		class="card-image"
-		style="background: {getCoverGradient(product.name)};"
-	>
-		<span class="card-image-icon">{categoryIcon}</span>
-		<Badge type={product.badge} />
+	<!-- Image du produit -->
+	<div class="card-image">
+		<img
+			src={product.image_url}
+			alt={product.title}
+			class="card-img"
+			loading="lazy"
+		/>
+		{#if !product.in_stock}
+			<span class="out-of-stock-badge">Rupture</span>
+		{/if}
 	</div>
 
 	<!-- Informations produit -->
 	<div class="card-body">
+		<p class="card-category" style="color: {colors.textSecondary};">
+			{product.category_name}
+		</p>
 		<p class="card-name" style="color: {colors.textPrimary};">
-			{product.name}
+			{product.title}
 		</p>
 
-		<Stars rating={product.rating} reviewsCount={product.reviewsCount} />
+		<Stars rating={product.rating} />
 
 		<div class="card-footer">
 			<div class="card-prices">
-				<span class="price-current">{formatPrice(product.price)}</span>
-				{#if product.originalPrice}
-					<span class="price-original" style="color: {colors.textDim};">
-						{formatPrice(product.originalPrice)}
-					</span>
-				{/if}
+				<span class="price-current">
+					{formatPrice(product.price, product.currency)}
+				</span>
 			</div>
 
 			<!-- Bouton ajout rapide au panier -->
 			<button
 				class="add-btn"
 				onclick={handleAddToCart}
+				disabled={!product.in_stock}
 			>
 				+
 			</button>
@@ -102,23 +98,48 @@
 		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 	}
 
-	/* Image placeholder */
+	/* Image du produit */
 	.card-image {
 		height: 180px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		position: relative;
+		background: #f5f5f5;
+		overflow: hidden;
 	}
 
-	.card-image-icon {
-		font-size: 40px;
-		opacity: 0.6;
+	.card-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.out-of-stock-badge {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		font-size: 9px;
+		font-weight: 700;
+		padding: 4px 10px;
+		border-radius: 6px;
+		color: #FFF;
+		background: #E53E3E;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
 	}
 
 	/* Corps de la carte */
 	.card-body {
 		padding: 14px 16px;
+	}
+
+	.card-category {
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin: 0 0 2px;
 	}
 
 	.card-name {
@@ -150,11 +171,6 @@
 		color: var(--ci-orange, #FF8C00);
 	}
 
-	.price-original {
-		font-size: 11px;
-		text-decoration: line-through;
-	}
-
 	/* Bouton ajout panier */
 	.add-btn {
 		width: 34px;
@@ -171,25 +187,24 @@
 		transition: all 0.2s;
 	}
 
-	.add-btn:hover {
+	.add-btn:hover:not(:disabled) {
 		background: var(--ci-orange, #FF8C00);
 		color: #FFF;
 	}
 
-	/* === Responsive — Cartes adaptatives === */
+	.add-btn:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
 
-	/* Tablette — image légèrement réduite */
+	/* === Responsive === */
+
 	@media (max-width: 768px) {
 		.card-image {
 			height: 150px;
 		}
-
-		.card-image-icon {
-			font-size: 34px;
-		}
 	}
 
-	/* Mobile — cible tactile suffisante pour le bouton ajout */
 	@media (max-width: 640px) {
 		.card-image {
 			height: 140px;
@@ -207,14 +222,12 @@
 			font-size: 14px;
 		}
 
-		/* Bouton ajout plus grand pour le tactile */
 		.add-btn {
 			width: 38px;
 			height: 38px;
 			font-size: 18px;
 		}
 
-		/* Désactiver le hover/transform sur mobile (pas de souris) */
 		.card:hover {
 			transform: none;
 			box-shadow: none;

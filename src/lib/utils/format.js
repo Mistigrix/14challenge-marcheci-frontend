@@ -6,12 +6,24 @@
  */
 
 /**
- * Formate un montant en Francs CFA (format ivoirien).
- * @param {number} amount - Montant à formater
- * @returns {string} Montant formaté (ex: "25 000 F")
+ * Formate un prix pour l'affichage.
+ * Accepte un nombre ou une chaîne (format API : "51.77").
+ * @param {number|string} amount - Montant à formater
+ * @param {string} [currency='GBP'] - Code devise (ex: "GBP", "EUR")
+ * @returns {string} Montant formaté (ex: "£51.77")
  */
-export function formatPrice(amount) {
-	return amount.toLocaleString('fr-FR') + ' F';
+export function formatPrice(amount, currency = 'GBP') {
+	const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+	if (isNaN(num)) return '—';
+
+	const symbols = { GBP: '£', EUR: '€', USD: '$', XOF: 'F' };
+	const symbol = symbols[currency] || currency;
+
+	// Format avec 2 décimales pour les devises internationales
+	if (currency === 'XOF') {
+		return num.toLocaleString('fr-FR') + ' F';
+	}
+	return symbol + num.toFixed(2);
 }
 
 /**

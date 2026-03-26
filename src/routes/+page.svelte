@@ -1,12 +1,12 @@
 <!--
-  Page Catalogue (accueil) — Grille de produits avec filtres et tri
+  Page Catalogue (accueil) — Grille de produits avec filtres, tri et pagination
 
   Affiche :
   - Titre et sous-titre du marché
-  - Filtres par catégorie
+  - Filtres par catégorie (depuis l'API)
   - Barre de tri
-  - Skeleton loaders pendant le chargement
   - Grille responsive de ProductCards
+  - Pagination en bas de page
 -->
 <script>
 	import { onMount } from 'svelte';
@@ -15,19 +15,29 @@
 	import ProductCard from '$lib/components/products/ProductCard.svelte';
 	import SkeletonCard from '$lib/components/ui/SkeletonCard.svelte';
 	import { themeColors } from '$lib/stores/theme.js';
-	import { filteredProducts } from '$lib/stores/filters.js';
+	import {
+		products,
+		loading,
+		error,
+		currentPage,
+		totalPages,
+		loadProducts,
+		loadCategories,
+		goToPage
+	} from '$lib/stores/filters.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 
 	const colors = $derived($themeColors);
-	const displayedProducts = $derived($filteredProducts);
+	const displayedProducts = $derived($products);
+	const isLoading = $derived($loading);
+	const errorMsg = $derived($error);
+	const page = $derived($currentPage);
+	const pages = $derived($totalPages);
 
-	/** Simule un chargement initial (sera remplacé par l'appel API Django) */
-	let loading = $state(true);
-
+	/** Chargement initial des catégories et produits */
 	onMount(() => {
-		// Simule le temps de chargement — à remplacer par fetch API
-		const timer = setTimeout(() => { loading = false; }, 800);
-		return () => clearTimeout(timer);
+		loadCategories();
+		loadProducts();
 	});
 </script>
 
@@ -42,7 +52,7 @@
 			Le marché de <span style="color: {CI_ORANGE};">Côte d'Ivoire</span>
 		</h1>
 		<p class="catalog-subtitle" style="color: {colors.textSecondary};">
-			Artisanat, mode, beauté, alimentation — le meilleur du terroir ivoirien
+			Découvrez notre catalogue de produits
 		</p>
 	</div>
 
@@ -52,12 +62,24 @@
 	<!-- Barre de tri et compteur -->
 	<SortBar />
 
+	<!-- Message d'erreur -->
+	{#if errorMsg}
+		<div class="error-msg">
+			<p>Erreur : {errorMsg}</p>
+			<button class="retry-btn" onclick={loadProducts}>Réessayer</button>
+		</div>
+	{/if}
+
 	<!-- Grille de produits avec skeleton pendant le chargement -->
-	{#if loading}
+	{#if isLoading}
 		<div class="product-grid">
 			{#each Array(8) as _}
 				<SkeletonCard />
 			{/each}
+		</div>
+	{:else if displayedProducts.length === 0}
+		<div class="empty-state" style="color: {colors.textSecondary};">
+			<p>Aucun produit trouvé.</p>
 		</div>
 	{:else}
 		<div class="product-grid">
@@ -65,6 +87,33 @@
 				<ProductCard {product} />
 			{/each}
 		</div>
+
+		<!-- Pagination -->
+		{#if pages > 1}
+			<div class="pagination">
+				<button
+					class="page-btn"
+					disabled={page <= 1}
+					style="border-color: {colors.border}; color: {colors.textSecondary};"
+					onclick={() => goToPage(page - 1)}
+				>
+					← Précédent
+				</button>
+
+				<span class="page-info" style="color: {colors.textSecondary};">
+					Page {page} / {pages}
+				</span>
+
+				<button
+					class="page-btn"
+					disabled={page >= pages}
+					style="border-color: {colors.border}; color: {colors.textSecondary};"
+					onclick={() => goToPage(page + 1)}
+				>
+					Suivant →
+				</button>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -97,9 +146,73 @@
 		gap: 16px;
 	}
 
-	/* === Responsive — Réduction du padding et tailles sur mobile === */
+	/* Message d'erreur */
+	.error-msg {
+		text-align: center;
+		padding: 24px;
+		color: #E53E3E;
+		font-size: 14px;
+	}
 
-	/* Tablette — grille 2 colonnes, padding réduit */
+	.retry-btn {
+		margin-top: 8px;
+		padding: 8px 20px;
+		border-radius: 8px;
+		border: 1px solid #E53E3E;
+		background: transparent;
+		color: #E53E3E;
+		cursor: pointer;
+		font-family: 'DM Sans', sans-serif;
+		font-weight: 600;
+	}
+
+	/* État vide */
+	.empty-state {
+		text-align: center;
+		padding: 40px;
+		font-size: 14px;
+	}
+
+	/* Pagination */
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 16px;
+		margin-top: 32px;
+		padding-top: 24px;
+	}
+
+	.page-btn {
+		padding: 10px 20px;
+		border-radius: 10px;
+		border: 1px solid;
+		background: transparent;
+		cursor: pointer;
+		font-size: 12px;
+		font-weight: 600;
+		font-family: 'DM Sans', sans-serif;
+		transition: all 0.2s;
+	}
+
+	.page-btn:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+
+	.page-btn:hover:not(:disabled) {
+		background: rgba(255, 140, 0, 0.08);
+		color: var(--ci-orange, #FF8C00);
+		border-color: var(--ci-orange, #FF8C00);
+	}
+
+	.page-info {
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	/* === Responsive === */
+
 	@media (max-width: 768px) {
 		.catalog {
 			padding: 20px 20px 40px;
@@ -115,7 +228,6 @@
 		}
 	}
 
-	/* Mobile — grille 1 colonne, titre compact */
 	@media (max-width: 640px) {
 		.catalog {
 			padding: 16px 12px 40px;
@@ -134,10 +246,18 @@
 			font-size: 13px;
 		}
 
-		/* Une seule colonne sur mobile */
 		.product-grid {
 			grid-template-columns: 1fr;
 			gap: 12px;
+		}
+
+		.pagination {
+			gap: 8px;
+		}
+
+		.page-btn {
+			padding: 10px 14px;
+			font-size: 11px;
 		}
 	}
 </style>

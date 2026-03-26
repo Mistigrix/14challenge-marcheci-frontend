@@ -1,47 +1,32 @@
 <!--
   CategoryFilter — Barre de filtrage par catégorie
 
-  Affiche les catégories sous forme de boutons horizontaux
-  avec icône et compteur de produits.
+  Affiche les catégories récupérées depuis l'API sous forme
+  de boutons horizontaux scrollables.
 -->
 <script>
 	import { themeColors } from '$lib/stores/theme.js';
-	import { selectedCategory } from '$lib/stores/filters.js';
-	import { categories, getProductsCount } from '$lib/data/products.js';
+	import { selectedCategory, categories, selectCategory } from '$lib/stores/filters.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 
 	const colors = $derived($themeColors);
 	const active = $derived($selectedCategory);
-
-	/** Sélectionne une catégorie */
-	function selectCategory(id) {
-		selectedCategory.set(id);
-	}
+	const cats = $derived($categories);
 </script>
 
 <div class="categories">
-	{#each categories as cat}
+	{#each cats as cat}
 		<button
 			class="category-btn"
-			class:active={active === cat.id}
+			class:active={active === cat.slug}
 			style="
-				border-color: {active === cat.id ? 'transparent' : colors.border};
-				background: {active === cat.id ? `linear-gradient(135deg, ${CI_ORANGE}, #FFa040)` : 'transparent'};
-				color: {active === cat.id ? '#FFF' : colors.textSecondary};
+				border-color: {active === cat.slug ? 'transparent' : colors.border};
+				background: {active === cat.slug ? `linear-gradient(135deg, ${CI_ORANGE}, #FFa040)` : 'transparent'};
+				color: {active === cat.slug ? '#FFF' : colors.textSecondary};
 			"
-			onclick={() => selectCategory(cat.id)}
+			onclick={() => selectCategory(cat.slug)}
 		>
-			<span class="cat-icon">{cat.icon}</span>
 			{cat.name}
-			<span
-				class="cat-count"
-				style="
-					background: {active === cat.id ? 'rgba(255,255,255,0.25)' : `${colors.textDim}30`};
-					color: {active === cat.id ? '#FFF' : colors.textDim};
-				"
-			>
-				{getProductsCount(cat.id)}
-			</span>
 		</button>
 	{/each}
 </div>
@@ -52,6 +37,7 @@
 		gap: 8px;
 		margin-bottom: 20px;
 		overflow-x: auto;
+		flex-wrap: wrap;
 	}
 
 	.category-btn {
@@ -69,23 +55,13 @@
 		transition: all 0.2s;
 	}
 
-	.cat-icon {
-		font-size: 15px;
-	}
-
-	.cat-count {
-		font-size: 10px;
-		padding: 1px 6px;
-		border-radius: 4px;
-	}
-
-	/* === Responsive — Amélioration du scroll horizontal sur mobile === */
+	/* === Responsive === */
 	@media (max-width: 768px) {
 		.categories {
-			/* Masquer la scrollbar pour un aspect plus propre */
 			-ms-overflow-style: none;
 			scrollbar-width: none;
 			padding-bottom: 4px;
+			flex-wrap: nowrap;
 		}
 
 		.categories::-webkit-scrollbar {
@@ -95,14 +71,9 @@
 
 	@media (max-width: 640px) {
 		.category-btn {
-			/* Boutons plus compacts sur mobile mais tactiles */
 			padding: 8px 14px;
 			font-size: 11px;
 			min-height: 44px;
-		}
-
-		.cat-icon {
-			font-size: 14px;
 		}
 	}
 </style>

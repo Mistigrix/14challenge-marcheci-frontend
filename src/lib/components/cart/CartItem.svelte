@@ -1,44 +1,37 @@
 <!--
   CartItem — Ligne d'un article dans la sidebar panier
 
-  Affiche : image placeholder, nom, prix, contrôles de quantité, bouton supprimer.
+  Affiche : image du produit, nom, prix, contrôles de quantité, bouton supprimer.
 
   Props :
-  - item : objet CartItem (productId, name, price, quantity)
+  - item : objet CartItem (productId, name, price, currency, image_url, quantity)
 -->
 <script>
 	import { themeColors } from '$lib/stores/theme.js';
 	import { updateQuantity, removeFromCart } from '$lib/stores/cart.js';
-	import { getCoverGradient } from '$lib/utils/colors.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 	import { formatPrice } from '$lib/utils/format.js';
-	import { products, categories } from '$lib/data/products.js';
 
 	/** @type {import('$lib/stores/cart.js').CartItem} */
 	let { item } = $props();
 
 	const colors = $derived($themeColors);
-
-	/** Retrouve l'icône de la catégorie de l'article */
-	const categoryIcon = $derived(() => {
-		const product = products.find((p) => p.id === item.productId);
-		return categories.find((c) => c.id === product?.category)?.icon || '';
-	});
 </script>
 
 <div class="cart-item" style="border-bottom-color: {colors.border};">
 	<!-- Miniature produit -->
-	<div
-		class="item-thumb"
-		style="background: {getCoverGradient(item.name)};"
-	>
-		<span class="item-thumb-icon">{categoryIcon()}</span>
+	<div class="item-thumb">
+		{#if item.image_url}
+			<img src={item.image_url} alt={item.name} class="item-thumb-img" />
+		{/if}
 	</div>
 
 	<!-- Détails et contrôles -->
 	<div class="item-details">
 		<p class="item-name" style="color: {colors.textPrimary};">{item.name}</p>
-		<p class="item-price" style="color: {CI_ORANGE};">{formatPrice(item.price)}</p>
+		<p class="item-price" style="color: {CI_ORANGE};">
+			{formatPrice(item.price, item.currency)}
+		</p>
 
 		<div class="item-controls">
 			<!-- Décrémenter -->
@@ -90,11 +83,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		overflow: hidden;
+		background: #f5f5f5;
 	}
 
-	.item-thumb-icon {
-		font-size: 20px;
-		opacity: 0.7;
+	.item-thumb-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	/* Détails */

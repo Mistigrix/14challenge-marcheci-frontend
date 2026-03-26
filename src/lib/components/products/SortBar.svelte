@@ -1,17 +1,17 @@
 <!--
   SortBar — Barre de tri et compteur de résultats
 
-  Affiche le nombre de produits trouvés et les options de tri :
-  Nouveautés, Prix croissant, Prix décroissant, Notes.
+  Affiche le nombre total de produits (depuis l'API)
+  et les options de tri.
 -->
 <script>
 	import { themeColors } from '$lib/stores/theme.js';
-	import { sortBy, filteredProducts } from '$lib/stores/filters.js';
+	import { sortBy, totalCount, applySort } from '$lib/stores/filters.js';
 	import { CI_GREEN } from '$lib/utils/colors.js';
 
 	const colors = $derived($themeColors);
 	const activeSort = $derived($sortBy);
-	const count = $derived($filteredProducts.length);
+	const count = $derived($totalCount);
 
 	/** Options de tri disponibles */
 	const sortOptions = [
@@ -20,11 +20,6 @@
 		{ key: 'price_desc', label: 'Prix ↓' },
 		{ key: 'rating', label: 'Notes' }
 	];
-
-	/** Change le critère de tri */
-	function setSort(key) {
-		sortBy.set(key);
-	}
 </script>
 
 <div class="sort-bar">
@@ -42,7 +37,7 @@
 					background: {activeSort === option.key ? `${CI_GREEN}15` : 'transparent'};
 					color: {activeSort === option.key ? CI_GREEN : colors.textDim};
 				"
-				onclick={() => setSort(option.key)}
+				onclick={() => applySort(option.key)}
 			>
 				{option.label}
 			</button>
@@ -77,16 +72,14 @@
 		font-family: 'DM Sans', sans-serif;
 	}
 
-	/* === Responsive — Empiler les éléments sur mobile === */
+	/* === Responsive === */
 	@media (max-width: 640px) {
-		/* Empiler le compteur et les options de tri */
 		.sort-bar {
 			flex-direction: column;
 			align-items: flex-start;
 			gap: 8px;
 		}
 
-		/* Options de tri en scroll horizontal */
 		.sort-options {
 			width: 100%;
 			overflow-x: auto;
@@ -98,7 +91,6 @@
 			display: none;
 		}
 
-		/* Boutons de tri avec taille tactile suffisante */
 		.sort-btn {
 			min-height: 36px;
 			padding: 6px 14px;

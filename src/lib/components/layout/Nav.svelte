@@ -12,7 +12,7 @@
 	import { goto } from '$app/navigation';
 	import FlagBar from '$lib/components/ui/FlagBar.svelte';
 	import { darkMode, toggleDarkMode, themeColors } from '$lib/stores/theme.js';
-	import { searchQuery } from '$lib/stores/filters.js';
+	import { searchQuery, applySearch } from '$lib/stores/filters.js';
 	import { showCart, totalItems } from '$lib/stores/cart.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 	import { page } from '$app/state';
@@ -30,9 +30,20 @@
 		goto('/');
 	}
 
+	/** Délai pour éviter les appels API à chaque frappe */
+	let searchTimer;
+
 	/** Met à jour la recherche et redirige vers le catalogue */
 	function handleSearch(event) {
-		searchQuery.set(event.target.value);
+		const value = event.target.value;
+		searchQuery.set(value);
+
+		// Debounce : attend 400ms avant de lancer la recherche API
+		clearTimeout(searchTimer);
+		searchTimer = setTimeout(() => {
+			applySearch(value);
+		}, 400);
+
 		if (currentPath !== '/') {
 			goto('/');
 		}
