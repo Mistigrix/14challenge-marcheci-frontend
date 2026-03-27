@@ -9,10 +9,10 @@
  * Formate un prix pour l'affichage.
  * Accepte un nombre ou une chaîne (format API : "51.77").
  * @param {number|string} amount - Montant à formater
- * @param {string} [currency='GBP'] - Code devise (ex: "GBP", "EUR")
- * @returns {string} Montant formaté (ex: "£51.77")
+ * @param {string} [currency='XOF'] - Code devise (ex: "XOF", "EUR")
+ * @returns {string} Montant formaté (ex: "2 500 F")
  */
-export function formatPrice(amount, currency = 'GBP') {
+export function formatPrice(amount, currency = 'XOF') {
 	const num = typeof amount === 'string' ? parseFloat(amount) : amount;
 	if (isNaN(num)) return '—';
 

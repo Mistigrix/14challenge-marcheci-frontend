@@ -1,24 +1,13 @@
 <!--
   CartSidebar — Panneau latéral du panier (slide-in depuis la droite)
 
-  Affiche la liste des articles, les totaux (sous-total, TVA, TTC)
-  et un bouton pour passer à la commande.
-  Overlay semi-transparent en arrière-plan quand le panier est ouvert.
+  Affiche la liste des produits ajoutés avec prix et lien d'achat.
+  Pas de système de commande — redirige vers le site source.
 -->
 <script>
-	import { goto } from '$app/navigation';
 	import CartItem from './CartItem.svelte';
 	import { darkMode, themeColors } from '$lib/stores/theme.js';
-	import {
-		cart,
-		showCart,
-		subtotal,
-		tax,
-		totalItems,
-		totalPrice
-	} from '$lib/stores/cart.js';
-	import { CI_ORANGE } from '$lib/utils/colors.js';
-	import { formatPrice } from '$lib/utils/format.js';
+	import { cart, showCart, totalItems } from '$lib/stores/cart.js';
 
 	const colors = $derived($themeColors);
 	const isDark = $derived($darkMode);
@@ -26,15 +15,9 @@
 	const items = $derived($cart);
 	const itemCount = $derived($totalItems);
 
-	/** Ferme la sidebar panier */
+	/** Ferme la sidebar */
 	function closeCart() {
 		showCart.set(false);
-	}
-
-	/** Redirige vers le checkout et ferme le panier */
-	function goToCheckout() {
-		closeCart();
-		goto('/checkout');
 	}
 </script>
 
@@ -57,7 +40,7 @@
 	<!-- En-tête -->
 	<div class="sidebar-header">
 		<h3 class="sidebar-title" style="color: {colors.textPrimary};">
-			Panier ({itemCount})
+			Mon panier ({itemCount})
 		</h3>
 		<button
 			class="close-btn"
@@ -75,33 +58,23 @@
 			<p class="empty-text" style="color: {colors.textSecondary};">
 				Votre panier est vide
 			</p>
+			<p class="empty-hint" style="color: {colors.textDim};">
+				Ajoutez des produits pour les retrouver ici
+			</p>
 		</div>
 	{:else}
-		<!-- Liste des articles -->
+		<!-- Liste des produits -->
 		<div class="cart-items">
 			{#each items as item (item.productId)}
 				<CartItem {item} />
 			{/each}
 		</div>
 
-		<!-- Totaux et bouton commander -->
-		<div class="cart-totals" style="border-top-color: {colors.border};">
-			<div class="total-row">
-				<span class="total-label" style="color: {colors.textSecondary};">Sous-total</span>
-				<span class="total-value" style="color: {colors.textPrimary};">{formatPrice($subtotal)}</span>
-			</div>
-			<div class="total-row">
-				<span class="total-label" style="color: {colors.textSecondary};">TVA (18%)</span>
-				<span class="total-value" style="color: {colors.textPrimary};">{formatPrice($tax)}</span>
-			</div>
-			<div class="total-row final" style="border-top-color: {colors.border};">
-				<span class="total-final-label" style="color: {colors.textPrimary};">Total TTC</span>
-				<span class="total-final-value">{formatPrice($totalPrice)}</span>
-			</div>
-
-			<button class="checkout-btn" onclick={goToCheckout}>
-				Commander — {formatPrice($totalPrice)}
-			</button>
+		<!-- Info en bas -->
+		<div class="cart-footer" style="border-top-color: {colors.border};">
+			<p class="footer-hint" style="color: {colors.textSecondary};">
+				Cliquez sur « Acheter » pour être redirigé vers le site du vendeur.
+			</p>
 		</div>
 	{/if}
 </aside>
@@ -173,77 +146,41 @@
 
 	.empty-text {
 		font-size: 14px;
+		margin: 0 0 4px;
 	}
 
-	/* Liste des articles */
+	.empty-hint {
+		font-size: 12px;
+		margin: 0;
+	}
+
+	/* Liste des produits */
 	.cart-items {
 		flex: 1;
 		overflow-y: auto;
 	}
 
-	/* Totaux */
-	.cart-totals {
+	/* Footer */
+	.cart-footer {
 		border-top: 1px solid;
 		padding-top: 16px;
 		margin-top: 8px;
 	}
 
-	.total-row {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 6px;
+	.footer-hint {
+		font-size: 11px;
+		text-align: center;
+		margin: 0;
+		line-height: 1.5;
 	}
 
-	.total-label,
-	.total-value {
-		font-size: 12px;
-	}
-
-	.total-value {
-		font-weight: 500;
-	}
-
-	.total-row.final {
-		padding-top: 8px;
-		border-top: 1px solid;
-		margin-top: 8px;
-		margin-bottom: 16px;
-	}
-
-	.total-final-label {
-		font-size: 15px;
-		font-weight: 800;
-	}
-
-	.total-final-value {
-		font-size: 15px;
-		font-weight: 800;
-		color: var(--ci-orange, #FF8C00);
-	}
-
-	/* Bouton commander */
-	.checkout-btn {
-		width: 100%;
-		padding: 14px 0;
-		border-radius: 12px;
-		border: none;
-		cursor: pointer;
-		background: linear-gradient(135deg, #FF8C00, #FFa040);
-		color: #FFF;
-		font-size: 14px;
-		font-weight: 700;
-		font-family: 'DM Sans', sans-serif;
-		box-shadow: 0 4px 16px rgba(255, 140, 0, 0.2);
-	}
-
-	/* === Responsive — Sidebar pleine largeur sur mobile === */
+	/* === Responsive === */
 	@media (max-width: 640px) {
 		.sidebar {
 			width: 100%;
 			padding: 20px 16px;
 		}
 
-		/* Bouton fermer plus grand pour le tactile */
 		.close-btn {
 			font-size: 24px;
 			padding: 4px;
@@ -252,12 +189,6 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-		}
-
-		/* Bouton commander plus grand sur mobile */
-		.checkout-btn {
-			padding: 16px 0;
-			font-size: 15px;
 		}
 	}
 </style>

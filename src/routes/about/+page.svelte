@@ -46,8 +46,8 @@
 			(Adjamé, Treichville, Marcory), où l'on trouve le meilleur du terroir.
 		</p>
 		<p class="about-text" style="color: {colors.textSecondary};">
-			Panier interactif, checkout en 3 étapes avec Mobile Money (Orange, Wave, MTN),
-			et TVA ivoirienne de 18% intégrée.
+			Ajoutez des produits au panier et retrouvez les liens pour acheter directement
+			sur les sites des vendeurs ivoiriens.
 		</p>
 	</div>
 

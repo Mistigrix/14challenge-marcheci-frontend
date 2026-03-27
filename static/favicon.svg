@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fond rond -->
+  <circle cx="32" cy="32" r="30" fill="#FF8C00"/>
+  <!-- Drapeau CI en bande verticale -->
+  <rect x="16" y="18" width="10" height="28" rx="3" fill="#FF8C00" stroke="#FFF" stroke-width="1.5"/>
+  <rect x="27" y="18" width="10" height="28" rx="0" fill="#FFFFFF"/>
+  <rect x="38" y="18" width="10" height="28" rx="3" fill="#009E49"/>
+  <!-- Lettre M stylisée en bas -->
+  <text x="32" y="56" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="12" fill="#FFF">MCI</text>
+</svg>

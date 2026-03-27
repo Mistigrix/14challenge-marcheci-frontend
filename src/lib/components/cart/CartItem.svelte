@@ -1,14 +1,14 @@
 <!--
-  CartItem — Ligne d'un article dans la sidebar panier
+  CartItem — Ligne d'un produit dans la sidebar panier
 
-  Affiche : image du produit, nom, prix, contrôles de quantité, bouton supprimer.
+  Affiche : image, nom, prix, lien d'achat et bouton supprimer.
 
   Props :
-  - item : objet CartItem (productId, name, price, currency, image_url, quantity)
+  - item : objet CartItem (productId, name, price, currency, image_url, product_url)
 -->
 <script>
 	import { themeColors } from '$lib/stores/theme.js';
-	import { updateQuantity, removeFromCart } from '$lib/stores/cart.js';
+	import { removeFromCart } from '$lib/stores/cart.js';
 	import { CI_ORANGE } from '$lib/utils/colors.js';
 	import { formatPrice } from '$lib/utils/format.js';
 
@@ -26,41 +26,33 @@
 		{/if}
 	</div>
 
-	<!-- Détails et contrôles -->
+	<!-- Détails -->
 	<div class="item-details">
 		<p class="item-name" style="color: {colors.textPrimary};">{item.name}</p>
 		<p class="item-price" style="color: {CI_ORANGE};">
 			{formatPrice(item.price, item.currency)}
 		</p>
 
-		<div class="item-controls">
-			<!-- Décrémenter -->
-			<button
-				class="qty-btn"
-				style="border-color: {colors.border}; color: {colors.textSecondary};"
-				onclick={() => updateQuantity(item.productId, item.quantity - 1)}
-			>
-				-
-			</button>
-
-			<!-- Quantité -->
-			<span class="qty-value" style="color: {colors.textPrimary};">{item.quantity}</span>
-
-			<!-- Incrémenter -->
-			<button
-				class="qty-btn"
-				style="border-color: {colors.border}; color: {colors.textSecondary};"
-				onclick={() => updateQuantity(item.productId, item.quantity + 1)}
-			>
-				+
-			</button>
+		<div class="item-actions">
+			<!-- Lien vers le site source -->
+			{#if item.product_url}
+				<a
+					href={item.product_url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="buy-link"
+					onclick={(e) => e.stopPropagation()}
+				>
+					Acheter →
+				</a>
+			{/if}
 
 			<!-- Supprimer -->
 			<button
 				class="remove-btn"
 				onclick={() => removeFromCart(item.productId)}
 			>
-				Supprimer
+				Retirer
 			</button>
 		</div>
 	</div>
@@ -114,28 +106,26 @@
 		margin: 0 0 6px;
 	}
 
-	/* Contrôles de quantité */
-	.item-controls {
+	/* Actions */
+	.item-actions {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 12px;
 	}
 
-	.qty-btn {
-		width: 26px;
-		height: 26px;
+	.buy-link {
+		font-size: 11px;
+		font-weight: 700;
+		color: #009E49;
+		text-decoration: none;
+		padding: 4px 10px;
 		border-radius: 6px;
-		border: 1px solid;
-		background: transparent;
-		cursor: pointer;
-		font-size: 14px;
+		background: rgba(0, 158, 73, 0.08);
+		transition: all 0.2s;
 	}
 
-	.qty-value {
-		font-size: 13px;
-		font-weight: 600;
-		width: 20px;
-		text-align: center;
+	.buy-link:hover {
+		background: rgba(0, 158, 73, 0.15);
 	}
 
 	.remove-btn {
@@ -144,7 +134,7 @@
 		border: none;
 		cursor: pointer;
 		color: #E53E3E;
-		font-size: 12px;
+		font-size: 11px;
 		font-family: 'DM Sans', sans-serif;
 	}
 </style>

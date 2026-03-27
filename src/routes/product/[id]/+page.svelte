@@ -135,25 +135,26 @@
 					{product.in_stock ? 'En stock' : 'Rupture de stock'}
 				</p>
 
-				<!-- Bouton ajout panier -->
-				<button
-					class="add-to-cart-btn"
-					onclick={() => addToCart(product)}
-					disabled={!product.in_stock}
-				>
-					{#if product.in_stock}
-						Ajouter au panier — {formatPrice(product.price, product.currency)}
-					{:else}
-						Indisponible
-					{/if}
-				</button>
+				<!-- Actions -->
+				<div class="product-actions">
+					<button
+						class="add-to-cart-btn"
+						onclick={() => addToCart(product)}
+					>
+						Ajouter au panier
+					</button>
 
-				<!-- Source du produit -->
-				{#if product.source}
-					<p class="product-source" style="color: {colors.textDim};">
-						Source : {product.source}
-					</p>
-				{/if}
+					{#if product.product_url}
+						<a
+							href={product.product_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="buy-link-btn"
+						>
+							Acheter sur {product.source || 'le site'} →
+						</a>
+					{/if}
+				</div>
 			</div>
 		</div>
 
@@ -289,6 +290,13 @@
 		margin-top: 12px;
 	}
 
+	/* Actions */
+	.product-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
 	/* Bouton ajout panier */
 	.add-to-cart-btn {
 		width: 100%;
@@ -305,11 +313,26 @@
 		transition: all 0.2s;
 	}
 
-	.add-to-cart-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		background: #999;
-		box-shadow: none;
+	/* Bouton acheter sur le site source */
+	.buy-link-btn {
+		display: block;
+		width: 100%;
+		padding: 13px 0;
+		border-radius: 12px;
+		border: 2px solid #009E49;
+		background: transparent;
+		color: #009E49;
+		font-size: 14px;
+		font-weight: 700;
+		font-family: 'DM Sans', sans-serif;
+		text-align: center;
+		text-decoration: none;
+		transition: all 0.2s;
+		box-sizing: border-box;
+	}
+
+	.buy-link-btn:hover {
+		background: rgba(0, 158, 73, 0.08);
 	}
 
 	/* Produits similaires */
