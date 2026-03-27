@@ -1,28 +1,31 @@
-# MarchéCI 🇨🇮
+# MarchéCI
 
-**Le marché de Côte d'Ivoire** — Boutique en ligne dédiée aux produits ivoiriens : artisanat, mode, beauté et alimentation.
+**Le marché de Côte d'Ivoire** — Vitrine en ligne des produits du marché ivoirien : fruits, légumes, viandes, poissons, épices, hygiène et plus encore.
 
-Inspiré des grands marchés d'Abidjan (Adjamé, Treichville, Marcory), symbole fort du commerce et de la vie quotidienne ivoirienne.
+Inspiré des grands marchés d'Abidjan (Adjamé, Treichville, Marcory). Les données sont scrappées depuis [lemarcheci.com](https://lemarcheci.com) et servies par une API Django.
 
-> Challenge 14-14-14 · Jour 11 · Mars 2026
+> Challenge 14-14-14 · Mars 2026
 
 ## Fonctionnalités
 
-- Catalogue de produits avec filtres par catégorie et recherche
-- Tri par prix, notes ou nouveautés
+- Catalogue de **364 produits** répartis en **16 catégories**
+- Filtres par catégorie, recherche textuelle et tri (prix, notes, nouveautés)
+- Pagination côté serveur (20 produits par page)
 - Page produit détaillée avec produits similaires
-- Panier interactif (ajout, suppression, modification de quantité)
-- Calcul automatique des totaux avec TVA ivoirienne (18%)
-- Checkout en 3 étapes (adresse → paiement → confirmation)
-- Paiement : Mobile Money (Orange, Wave, MTN), carte bancaire, paiement à la livraison
+- Panier avec lien d'achat vers le site du vendeur (lemarcheci.com)
 - Mode sombre / clair
 - Design responsive (mobile, tablette, desktop)
+- Images et prix réels en Francs CFA (XOF)
 
 ## Stack technique
 
-| Frontend | Backend (prévu) | Base de données |
-|----------|----------------|-----------------|
-| Svelte 5 + SvelteKit 2 | Django (Python) | SQLite / PostgreSQL |
+| Frontend | Backend | API |
+|----------|---------|-----|
+| Svelte 5 + SvelteKit 2 | Django (Python) | REST API publique |
+
+- **API** : `https://api.marcheci.chalenge14.com`
+- **Endpoints** : `/api/products/`, `/api/products/:id/`, `/api/categories/`
+- **Données** : scrappées depuis lemarcheci.com (364 produits, 16 catégories)
 
 ## Installation
 
@@ -46,23 +49,32 @@ npm run build      # Build de production
 npm run preview    # Prévisualiser le build
 ```
 
+## Docker
+
+```bash
+# Build de l'image (l'URL API est configurable via --build-arg)
+docker build -t marcheci .
+
+# Lancer le conteneur
+docker run -p 3000:3000 marcheci
+```
+
 ## Architecture
 
 ```
 src/
 ├── lib/
-│   ├── data/           # Données produits et catégories
+│   ├── api/            # Client API (fetch produits, catégories)
 │   ├── stores/         # Stores Svelte (cart, theme, filters)
-│   ├── utils/          # Utilitaires (couleurs, formatage)
+│   ├── utils/          # Utilitaires (couleurs, formatage FCFA)
 │   └── components/
-│       ├── ui/         # Composants réutilisables (FlagBar, InputField, Badge, Stars)
+│       ├── ui/         # Composants réutilisables (FlagBar, Stars, Loader...)
 │       ├── layout/     # Navigation et Footer
 │       ├── cart/       # Sidebar panier et items
 │       └── products/   # Carte produit, filtres, tri
 ├── routes/
 │   ├── +page.svelte              # Catalogue (accueil)
 │   ├── product/[id]/+page.svelte # Détail produit
-│   ├── checkout/+page.svelte     # Checkout 3 étapes
 │   └── about/+page.svelte        # À propos
 └── app.css                        # Styles globaux
 ```
@@ -77,4 +89,4 @@ src/
 
 ## Licence
 
-Open Source — [225os.com](https://225os.com) & [GitHub](https://github.com)
+Open Source — [225os.com](https://225os.com)
