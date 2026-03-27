@@ -83,7 +83,7 @@
 		</div>
 
 		<p class="card-source">
-			Source : <span class="source-name">lemarcheci.com</span>
+			Source : <span class="source-name">{product.source}</span>
 		</p>
 	</div>
 </div>
