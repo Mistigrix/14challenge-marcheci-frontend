@@ -101,9 +101,14 @@
 				<div class="product-meta">
 					<span class="product-category">{product.category?.name}</span>
 					{#if product.source}
-						<span class="product-source" style="color: {colors.textDim};">
-							via {product.source}
-						</span>
+						<a
+							href={product.product_url || `https://${product.source}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="product-source-link"
+						>
+							{product.source}
+						</a>
 					{/if}
 				</div>
 
@@ -249,9 +254,19 @@
 		letter-spacing: 1px;
 	}
 
-	.product-source {
-		font-size: 10px;
-		font-style: italic;
+	.product-source-link {
+		font-size: 11px;
+		font-weight: 700;
+		color: #FF8C00;
+		text-decoration: none;
+		padding: 3px 10px;
+		border-radius: 6px;
+		background: rgba(255, 140, 0, 0.08);
+		transition: all 0.2s;
+	}
+
+	.product-source-link:hover {
+		background: rgba(255, 140, 0, 0.15);
 	}
 
 	/* Titre */

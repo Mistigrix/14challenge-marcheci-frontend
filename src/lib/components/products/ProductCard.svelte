@@ -82,8 +82,8 @@
 			</button>
 		</div>
 
-		<p class="card-source" style="color: {colors.textDim};">
-			lemarcheci.com
+		<p class="card-source">
+			Source : <span class="source-name">lemarcheci.com</span>
 		</p>
 	</div>
 </div>
@@ -177,9 +177,14 @@
 
 	/* Source */
 	.card-source {
-		font-size: 9px;
+		font-size: 10px;
 		margin: 6px 0 0;
-		font-style: italic;
+		color: #999;
+	}
+
+	.source-name {
+		font-weight: 700;
+		color: #FF8C00;
 	}
 
 	/* Bouton ajout panier */
