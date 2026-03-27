@@ -97,8 +97,15 @@
 
 			<!-- Informations produit -->
 			<div class="product-info">
-				<!-- Catégorie -->
-				<span class="product-category">{product.category?.name}</span>
+				<!-- Source et catégorie -->
+				<div class="product-meta">
+					<span class="product-category">{product.category?.name}</span>
+					{#if product.source}
+						<span class="product-source" style="color: {colors.textDim};">
+							via {product.source}
+						</span>
+					{/if}
+				</div>
 
 				<!-- Titre -->
 				<h1 class="product-name" style="color: {colors.textPrimary};">
@@ -227,13 +234,24 @@
 		border-radius: 20px;
 	}
 
-	/* Catégorie */
+	/* Source et catégorie */
+	.product-meta {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
 	.product-category {
 		font-size: 11px;
 		color: var(--ci-green, #009E49);
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 1px;
+	}
+
+	.product-source {
+		font-size: 10px;
+		font-style: italic;
 	}
 
 	/* Titre */

@@ -81,6 +81,10 @@
 				+
 			</button>
 		</div>
+
+		<p class="card-source" style="color: {colors.textDim};">
+			lemarcheci.com
+		</p>
 	</div>
 </div>
 
@@ -169,6 +173,13 @@
 		font-size: 16px;
 		font-weight: 800;
 		color: var(--ci-orange, #FF8C00);
+	}
+
+	/* Source */
+	.card-source {
+		font-size: 9px;
+		margin: 6px 0 0;
+		font-style: italic;
 	}
 
 	/* Bouton ajout panier */
